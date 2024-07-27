@@ -1,4 +1,5 @@
 *.auto.tfvars
+*.auto.tf
 *.backup
 
 # Local .terraform directories

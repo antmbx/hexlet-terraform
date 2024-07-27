@@ -10,7 +10,7 @@ terraform {
 
 
 
-variable "yc_token" {}
+#variable "yc_token" {}
 
 provider "yandex" {
   zone = "ru-central1-a"
@@ -18,11 +18,20 @@ provider "yandex" {
 }
 
 
+
+variable "folderID" {
+  description = "Folder ID"
+  type        = string
+  default     = "b1go7f4cj7d0ubcpu3m0"
+}
+
+
+
 resource "yandex_compute_instance" "default" {
   name        = "test"
   platform_id = "standard-v1"
   zone        = "ru-central1-a"
-  folder_id   = "b1go7f4cj7d0ubcpu3m0"
+  folder_id   = var.folderID
 
   resources {
     cores  = 2
@@ -43,14 +52,14 @@ resource "yandex_compute_instance" "default" {
 }
 
 resource "yandex_vpc_network" "default" {
-  folder_id = "b1go7f4cj7d0ubcpu3m0"
+  folder_id   = var.folderID
 }
 
 resource "yandex_vpc_subnet" "default" {
   zone           = "ru-central1-a"
   network_id     = "${yandex_vpc_network.default.id}"
   v4_cidr_blocks = ["10.5.0.0/24"]
-  folder_id      = "b1go7f4cj7d0ubcpu3m0"
+  folder_id   = var.folderID
 }
 
 resource "yandex_compute_disk" "default" {
@@ -58,7 +67,7 @@ resource "yandex_compute_disk" "default" {
   type     = "network-ssd"
   zone     = "ru-central1-a"
   image_id = "fd83s8u085j3mq231ago" // идентификатор образа Ubuntu
-  folder_id = "b1go7f4cj7d0ubcpu3m0"
+  folder_id   = var.folderID
 
   labels = {
     environment = "test"
