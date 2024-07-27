@@ -19,14 +19,6 @@ provider "yandex" {
 
 
 
-variable "folderID" {
-  description = "Folder ID"
-  type        = string
-  default     = "b1go7f4cj7d0ubcpu3m0"
-}
-
-
-
 resource "yandex_compute_instance" "default" {
   name        = "test"
   platform_id = "standard-v1"
