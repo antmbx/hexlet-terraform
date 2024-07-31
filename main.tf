@@ -36,11 +36,30 @@ resource "yandex_compute_instance" "default" {
 
   network_interface {
     subnet_id = "${yandex_vpc_subnet.default.id}"
+    nat = true // публичный IP
   }
 
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }
+
+  provisioner "remote-exec" {
+  inline = [
+<<EOT
+sudo docker run -d -p 0.0.0.0:80:3000 \
+  -e DB_TYPE=postgres \
+  -e DB_NAME=${var.db_name} \
+  -e DB_HOST=${yandex_mdb_postgresql_cluster.dbcluster.host.0.fqdn} \
+  -e DB_PORT=6432 \
+  -e DB_USER=${var.db_user} \
+  -e DB_PASS=${var.db_password} \
+  ghcr.io/requarks/wiki:2.5
+EOT
+    ]
+  }
+
+
+
 }
 
 resource "yandex_vpc_network" "default" {
@@ -58,7 +77,7 @@ resource "yandex_compute_disk" "default" {
   name     = "disk-name"
   type     = "network-ssd"
   zone     = "ru-central1-a"
-  image_id = "fd83s8u085j3mq231ago" // идентификатор образа Ubuntu
+  image_id = "fd83s8u085j3mq231ago" // идентификатор образа Ubuntu можно использовать данные из ресурсов data, например data.yandex_compute_image.img.id
   folder_id   = var.folderID
 
   labels = {
